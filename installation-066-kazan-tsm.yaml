@@ -1,0 +1,1252 @@
+# Установка №066 — Казань, ЦСМ.
+# Контракт формата: HydroCore/specs/installation-setup-format.md (SW-0014).
+# Источник [И]: FlowPlant-Configuration, _066_Казань_ЦСМ @ 31996c3, setup.json.
+# Комментарии исходного JSON сохранены в *_comments.
+
+apiVersion: hydrocore/v1
+kind: InstallationSetup
+metadata:
+  id: installation-066-kazan-tsm
+  title: Установка №066 — Казань, ЦСМ
+  description: 'Поверочная установка: 61 устройство, обвязка, сценарии розлива'
+  source:
+    repository: FlowPlant-Configuration
+    branch: _066_Казань_ЦСМ
+    commit: 31996c3266d3728f810f82a02523a840fc9ab620
+    file: setup.json
+global:
+  graphs:
+    '1':
+      vertexes:
+      - f0
+      edges: []
+    I:
+      vertexes:
+      - f0
+      - f1
+      edges:
+      - - f0
+        - f1
+    Y:
+      vertexes:
+      - f0
+      - f1
+      - f2
+      - y
+      edges:
+      - - f0
+        - y
+      - - f1
+        - y
+      - - f2
+        - y
+      export:
+      - f0
+      - f1
+      - f2
+    X:
+      vertexes:
+      - f0
+      - f1
+      - f2
+      - f3
+      - x
+      edges:
+      - - f0
+        - x
+      - - f1
+        - x
+      - - f2
+        - x
+      - - f3
+        - x
+      export:
+      - f0
+      - f1
+      - f2
+      - f3
+  device_types_comments:
+  - Верхний уровень — тип интерфейса, к которому подключён прибор; ниже — метрологическая роль.
+  - 'Virtual зарезервирован под виртуальные (эмулируемые) устройства с настраиваемыми параметрами: сейчас таких устройств
+    в схеме нет.'
+  - hydrometer — как в исходном конфиге (ДВ 1 был его единственным экземпляром и удалён как Virtual).
+  - 'relay — реле медленных импульсов: тот же драйвер, что у пневмозадвижек (type: valve), но коммутирует сигналы, а не поток,
+    поэтому в гидравлический граф не входит.'
+  device_types:
+    valve_simple:
+      type: valve
+      name: Задвижка (Откр|Закр)
+      graph@fluid: I
+    valve:
+      type: valve
+      name: Задвижка
+      graph@fluid: I
+    fcd:
+      type: valve
+      name: Устройство контроля потока
+      graph@fluid: I
+    flowmeter:
+      type: meter
+      name: Электрический расходомер
+      graph@fluid: I
+    thermometer:
+      type: meter
+      name: Термометр
+      graph@fluid: I
+    barometer:
+      type: meter
+      name: Барометр
+      graph@fluid: I
+    manometer:
+      type: meter
+      name: Манометр
+      graph@fluid: I
+    hydrometer:
+      type: meter
+      name: Гидрометр
+      graph@fluid: I
+    scales:
+      type: meter
+      name: Весы
+      graph@fluid: I
+    prover:
+      type: meter
+      name: Провер
+      graph@fluid: '1'
+    EMFT:
+      type: meter
+      name: Электромагнитный преобразователь расхода (ПРЭМ)
+      graph@fluid: I
+    thermogigrometer:
+      type: meter
+      name: Термогигрометр
+    ampermeter:
+      type: meter
+      name: Амперметр
+    voltemeter:
+      type: meter
+      name: Вольтметр
+    level_detector:
+      type: detector
+      name: Детектор уровня воды
+      graph@fluid: '1'
+    counter:
+      type: timer
+      name: Счётчик (старый)
+    counter_ex:
+      type: timer
+      name: Счётчик
+    pump:
+      type: valve
+      name: Насос
+      graph@fluid: I
+    relay:
+      type: valve
+      name: Реле медленных импульсов (герконовые расходомеры)
+  metrology:
+    density_correction_factor: 1
+plant:
+  devices_comments:
+  - prover_0x25 создаётся только при FP_PROVER_SUPPORT=true (сейчас false).
+  - 'relay_0xC1:7 — реле медленных импульсов (герконовые расходомеры): в коде это TDevicePneumaticValve.CreateOnModuleSuperBIO(193,
+    7), переключается вместе с командой счётчику (#01L / #01F) в SetSlowImpulseMode; в гидравлическом графе не участвует,
+    поэтому в число пневмозадвижек не входит.'
+  - 'Виртуальные устройства (ДВ 1 и Барометр 1 — зеркала каналов ДД 2/ДД 3) из схемы удалены: на установке таких приборов
+    нет. Тип Virtual зарезервирован под эмуляцию.'
+  devices:
+    flowmeter_0x1:0:
+      name: ЭР 1
+      device:
+        type: flowmeter
+      interface:
+        type: RS-485@flowmeter
+        address: 1
+        channel: 0
+        frequency: 115200
+    flowmeter_0x1:1:
+      name: ЭР 2
+      device:
+        type: flowmeter
+      interface:
+        type: RS-485@flowmeter
+        address: 1
+        channel: 1
+        frequency: 115200
+    flowmeter_0x1:2:
+      name: ЭР 3
+      device:
+        type: flowmeter
+      interface:
+        type: RS-485@flowmeter
+        address: 1
+        channel: 2
+        frequency: 115200
+    flowmeter_0x1:3:
+      name: ЭР 4
+      device:
+        type: flowmeter
+      interface:
+        type: RS-485@flowmeter
+        address: 1
+        channel: 3
+        frequency: 115200
+    thermometer_0x21:0:
+      name: ДТ 1
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 33
+        channel: 0
+        frequency: 115200
+    thermometer_0x21:1:
+      name: ДТ 2
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 33
+        channel: 1
+        frequency: 115200
+    thermometer_0x21:2:
+      name: ДТ 3
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 33
+        channel: 2
+        frequency: 115200
+    thermometer_0x21:3:
+      name: ДТ 4
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 33
+        channel: 3
+        frequency: 115200
+    thermometer_0x20:0:
+      name: ДТ 5
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 32
+        channel: 0
+        frequency: 115200
+    thermometer_0x20:1:
+      name: ДТ 6
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 32
+        channel: 1
+        frequency: 115200
+    thermometer_0x20:2:
+      name: ДТ 7
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 32
+        channel: 2
+        frequency: 115200
+    thermometer_0x20:3:
+      name: ДТ 8
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 32
+        channel: 3
+        frequency: 115200
+    thermometer_0x22:1:
+      name: ДТ 9
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 34
+        channel: 1
+        frequency: 115200
+    thermometer_0x22:0:
+      name: ДТ 10
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 34
+        channel: 0
+        frequency: 115200
+    thermometer_0x22:2:
+      name: ДТ 11
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 34
+        channel: 2
+        frequency: 115200
+    thermometer_0x23:0:
+      name: ДТ 12
+      device:
+        type: thermometer
+      interface:
+        type: RS-485@temperature:6
+        address: 35
+        channel: 0
+        frequency: 115200
+    manometer_0x5:4:
+      name: ДД 1
+      device:
+        type: manometer
+      interface:
+        type: RS-485@electricity
+        address: 5
+        channel: 4
+        frequency: 38400
+    manometer_0x5:6:
+      name: ДД 2
+      device:
+        type: manometer
+      interface:
+        type: RS-485@electricity
+        address: 5
+        channel: 6
+        frequency: 38400
+    manometer_0x5:5:
+      name: ДД 3
+      device:
+        type: manometer
+      interface:
+        type: RS-485@electricity
+        address: 5
+        channel: 5
+        frequency: 38400
+    valve_0x50:0:
+      name: Задвижка 1
+      device:
+        type: valve
+        time_to_switch: 200
+      interface:
+        type: RS-485@valve
+        address: 80
+        channel: 0
+        frequency: 115200
+    valve_0x50:1:
+      name: Задвижка 2
+      device:
+        type: valve
+        time_to_switch: 200
+      interface:
+        type: RS-485@valve
+        address: 80
+        channel: 1
+        frequency: 115200
+    valve_0x50:2:
+      name: Задвижка 3
+      device:
+        type: valve
+        time_to_switch: 200
+      interface:
+        type: RS-485@valve
+        address: 80
+        channel: 2
+        frequency: 115200
+    valve_0x51:0:
+      name: Задвижка 4
+      device:
+        type: valve
+        time_to_switch: 200
+      interface:
+        type: RS-485@valve
+        address: 81
+        channel: 0
+        frequency: 115200
+    valve_0x50:6:
+      name: ЭЗ 5
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@valve
+        address: 80
+        channel: 6
+        frequency: 115200
+    valve_0x50:7:
+      name: ЭЗ 6
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 20
+        two_limit_switch: false
+      interface:
+        type: RS-485@valve
+        address: 80
+        channel: 7
+        frequency: 115200
+    valve_0xC1:0:
+      name: ПЗ 1
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 0
+        frequency: 115200
+    valve_0xC1:3:
+      name: ПЗ 2
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 3
+        frequency: 115200
+    valve_0xC1:1:
+      name: ПЗ 3
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 1
+        frequency: 115200
+    valve_0xC1:2:
+      name: ПЗ 4
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 2
+        frequency: 115200
+    valve_0xC1:5:
+      name: ПЗ 5
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 5
+        frequency: 115200
+    valve_0xC1:4:
+      name: ПЗ 6
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 4
+        frequency: 115200
+    valve_0xC1:6:
+      name: ПЗ 7
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 6
+        frequency: 115200
+    valve_0xC1:8:
+      name: ПЗ 8
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 8
+        frequency: 115200
+    valve_0xC1:9:
+      name: ПЗ 9
+      device:
+        type: valve_simple
+        limit_switch_less: false
+        second_limit_switch: 0
+        time_to_switch: 0
+        two_limit_switch: false
+      interface:
+        type: RS-485@superbio
+        address: 193
+        channel: 9
+        frequency: 115200
+    valve_0x51:8:
+      name: Клапан 1
+      device:
+        type: valve_simple
+        controllable: false
+      interface:
+        type: RS-485@valve
+        address: 81
+        channel: 8
+        frequency: 115200
+    valve_0x51:7:
+      name: Клапан 2
+      device:
+        type: valve_simple
+        controllable: false
+      interface:
+        type: RS-485@valve
+        address: 81
+        channel: 7
+        frequency: 115200
+    valve_0x51:6:
+      name: Клапан 3
+      device:
+        type: valve_simple
+        controllable: false
+      interface:
+        type: RS-485@valve
+        address: 81
+        channel: 6
+        frequency: 115200
+    pump_0x2:
+      name: Насос 1
+      device:
+        type: pump
+        pressure_regulator: false
+      interface:
+        type: RS-485@danfoss:vlt6000
+        address: 2
+        frequency: 9600
+    pump_0x9:
+      name: Насос 2
+      device:
+        type: pump
+        pressure_regulator: false
+      interface:
+        type: RS-485@danfoss:vlt6000
+        address: 9
+        frequency: 9600
+    ld_0x51:8:
+      name: Детектор уровня воды 1
+      device:
+        type: level_detector
+      interface:
+        type: RS-485@valve
+        address: 81
+        channel: 8
+        frequency: 115200
+    ld_0x51:9:
+      name: Детектор уровня воды 2
+      device:
+        type: level_detector
+      interface:
+        type: RS-485@valve
+        address: 81
+        channel: 9
+        frequency: 115200
+    ld_0x50:8:
+      name: Детектор уровня воды 3
+      device:
+        type: level_detector
+      interface:
+        type: RS-485@valve
+        address: 80
+        channel: 8
+        frequency: 115200
+    ld_0x50:9:
+      name: Детектор уровня воды 4
+      device:
+        type: level_detector
+      interface:
+        type: RS-485@valve
+        address: 80
+        channel: 9
+        frequency: 115200
+    scales_0x80:
+      name: Весы 1
+      device:
+        type: scales
+        sensors_count: 3
+      interface:
+        type: RS-485@scales
+        address: 128
+        frequency: 115200
+    scales_0x81:
+      name: Весы 2
+      device:
+        type: scales
+        sensors_count: 3
+      interface:
+        type: RS-485@scales
+        address: 129
+        frequency: 115200
+    scales_0x82:
+      name: Весы 3
+      device:
+        type: scales
+        sensors_count: 3
+      interface:
+        type: RS-485@scales
+        address: 130
+        frequency: 115200
+    fcd_0x90:0:
+      name: УПП 1
+      device:
+        type: fcd
+      interface:
+        type: RS-485@fcd2
+        address: 144
+        channel: 0
+        frequency: 38400
+    fcd_0x90:1:
+      name: УПП 2
+      device:
+        type: fcd
+      interface:
+        type: RS-485@fcd2
+        address: 144
+        channel: 1
+        frequency: 38400
+    fcd_0x90:2:
+      name: УПП 3
+      device:
+        type: fcd
+      interface:
+        type: RS-485@fcd2
+        address: 144
+        channel: 2
+        frequency: 38400
+    counter_0x1:
+      name: Счётчик
+      device:
+        type: counter
+      interface:
+        type: RS-485@flowmeter
+        address: 1
+        frequency: 115200
+    thermogigrometer_0x40:
+      name: Термогигрометр
+      device:
+        type: thermogigrometer
+      interface:
+        type: RS-485@ivtm
+        address: 64
+        frequency: 115200
+    ampermeter_0x5:0:
+      name: Амперметр 1
+      device:
+        type: ampermeter
+      interface:
+        type: RS-485@electricity
+        address: 5
+        frequency: 38400
+        channel: 0
+    ampermeter_0x5:1:
+      name: Амперметр 2
+      device:
+        type: ampermeter
+      interface:
+        type: RS-485@electricity
+        address: 5
+        frequency: 38400
+        channel: 1
+    ampermeter_0x5:2:
+      name: Амперметр 3
+      device:
+        type: ampermeter
+      interface:
+        type: RS-485@electricity
+        address: 5
+        frequency: 38400
+        channel: 2
+    ampermeter_0x5:3:
+      name: Амперметр 4
+      device:
+        type: ampermeter
+      interface:
+        type: RS-485@electricity
+        address: 5
+        frequency: 38400
+        channel: 3
+    voltmeter_0x4:0:
+      name: Вольтметр 1
+      device:
+        type: voltemeter
+      interface:
+        type: RS-485@electricity
+        address: 4
+        frequency: 38400
+        channel: 0
+    voltmeter_0x4:1:
+      name: Вольтметр 2
+      device:
+        type: voltemeter
+      interface:
+        type: RS-485@electricity
+        address: 4
+        frequency: 38400
+        channel: 1
+    voltmeter_0x4:2:
+      name: Вольтметр 3
+      device:
+        type: voltemeter
+      interface:
+        type: RS-485@electricity
+        address: 4
+        frequency: 38400
+        channel: 2
+    voltmeter_0x4:3:
+      name: Вольтметр 4
+      device:
+        type: voltemeter
+      interface:
+        type: RS-485@electricity
+        address: 4
+        frequency: 38400
+        channel: 3
+    prover_0x25:
+      name: ТПУ
+      device:
+        type: prover
+      interface:
+        type: RS-485@prover
+        address: 37
+        frequency: 9600
+    relay_0xC1:7:
+      name: Реле медленных импульсов
+      device:
+        type: relay
+        limit_switch_less: false
+        two_limit_switch: false
+        second_limit_switch: 0
+        time_to_switch: 0
+      interface:
+        type: RS-485@superbio
+        address: 193
+        frequency: 115200
+        channel: 7
+  graph:
+    vertexes:
+      watertank:
+        type: watertank
+    edges_comments:
+    - Трубы являются устройствами, однако записывать их в список устройств значит сделать мусорку из конфига.
+    - Поэтому они создаются при инициализации установки из конфига. Существует несколько форматов записи связи двух устройств.
+    - Создаются как типы труб с корректной топологией (все найденные вершины-сокеты присоединяются к одной вертиуальной вершинЕ,
+      образуя связь все-ко-всем)
+    - так и конкретные экземпляры труб. Если имя трубы не указано (через @) значит она анонимная.
+    - Один сокет может подключаться только к одному сокету. Если нужно как-то разветвить - сделайте устройство-прослойку.
+    - pipe в [${pipe}@${name} не обязательно указывать явно, если сделать ${name} то это подхватиться.
+    - '-------------------------------------------------------------------------------------'
+    - Форма записи 1 - прямая пара
+    - d1|s <-> s|d2
+    - '[ [${d1}, ${d1:s}], [${d2}, ${d2:s}] ]'
+    - '-------------------------------------------------------------------------------------'
+    - Форма записи 2 - пара через трубу. быстрая запись. Если не указаны сокеты со стороны трубы, они будут использованы по
+      порядку.
+    - При этом можно указывать сокеты только для отдельных труб.
+    - d1|s <-> s1|pipe|s2 <-> s|d2
+    - '[ [], [${d1}, ${d1:s1}], [${d2}, ${d2:s}]]'
+    - '[ [], [${d1}, ${d1:s1}, ${pipe:s1}], [${d2}, ${d2:s}, ${pipe:s2}]]'
+    - '[ [${pipe}@${name}], [${d1}, ${d1:s}], [${d2}, ${d2:s}}] ]'
+    - '[ [${pipe}@${name}], [${d1}, ${d1:s}, ${pipe@name:s1}], [${d2}, ${d2:s},  ${pipe@name:s2}] ]'
+    - '-------------------------------------------------------------------------------------'
+    - Форма записи 3 - Множественное добавление к одной трубе. Если сокеты со стороны трубы не указаны, они будут созданы
+      автоматически.
+    - При этом можно указывать сокеты только для отдельных труб.
+    - '[ [], [${d1}, ${d1:s1}], ... , [${dn}, ${dn:s}]]'
+    - '[ [], [${d1}, ${d1:s1}, ${pipe:s1}], ... , [${dn}, ${dn:s}, ${pipe:s2}]]'
+    - '[ [${pipe}@${name}], [${d1}, ${d1:s}], ... , [${dn}, ${dn:s}}] ]'
+    - '[ [${pipe}@${name}], [${d1}, ${d1:s}, ${pipe@name:s1}], ... , [${dn}, ${dn:s},  ${pipe@name:s2}] ]'
+    edges:
+    - - []
+      - - flowmeter_0x1:0
+        - f0
+      - - thermometer_0x20:0
+        - f1
+    - - []
+      - - flowmeter_0x1:1
+        - f0
+      - - thermometer_0x20:1
+        - f1
+    - - []
+      - - flowmeter_0x1:2
+        - f0
+      - - thermometer_0x20:2
+        - f1
+    - - []
+      - - flowmeter_0x1:3
+        - f0
+      - - thermometer_0x20:3
+        - f1
+    - - []
+      - - thermometer_0x20:0
+        - f0
+      - - valve_0x50:0
+        - f1
+    - - []
+      - - thermometer_0x20:1
+        - f0
+      - - valve_0x50:1
+        - f1
+      - - valve_0x50:6
+        - f1
+    - - []
+      - - thermometer_0x20:2
+        - f0
+      - - valve_0x50:2
+        - f1
+    - - []
+      - - thermometer_0x20:3
+        - f0
+      - - valve_0x51:0
+        - f1
+    - - []
+      - - manometer_0x5:5
+        - f0
+      - - flowmeter_0x1:0
+        - f1
+      - - flowmeter_0x1:1
+        - f1
+      - - flowmeter_0x1:2
+        - f1
+      - - flowmeter_0x1:3
+        - f1
+    - - []
+      - - manometer_0x5:5
+        - f1
+      - - thermometer_0x21:3
+        - f0
+    - - []
+      - - thermometer_0x21:3
+        - f1
+      - - manometer_0x5:6
+        - f0
+    - - []
+      - - manometer_0x5:6
+        - f1
+      - - valve_0xC1:2
+        - f0
+      - - valve_0xC1:3
+        - f0
+    - - []
+      - - valve_0xC1:3
+        - f1
+      - - valve_0xC1:0
+        - f0
+      - - ld_0x50:8
+        - f0
+    - - []
+      - - valve_0xC1:1
+        - f0
+      - - valve_0xC1:2
+        - f1
+      - - thermometer_0x21:2
+        - f0
+      - - thermometer_0x21:2
+        - f1
+      - - ld_0x50:9
+        - f0
+    - - []
+      - - valve_0xC1:1
+        - f1
+      - - thermometer_0x21:1
+        - f0
+    - - []
+      - - valve_0xC1:0
+        - f1
+      - - thermometer_0x21:0
+        - f0
+    - - []
+      - - manometer_0x5:4
+        - f0
+      - - thermometer_0x21:1
+        - f1
+      - - thermometer_0x21:0
+        - f1
+    - - []
+      - - manometer_0x5:4
+        - f1
+      - - pump_0x2
+        - f0
+      - - pump_0x9
+        - f0
+    - - []
+      - - pump_0x2
+        - f1
+      - - valve_0x50:7
+        - f0
+      - - watertank
+    - - []
+      - - valve_0x50:7
+        - f1
+      - - watertank
+    - - []
+      - - pump_0x9
+        - f1
+      - - valve_0xC1:6
+        - f0
+    - - []
+      - - valve_0xC1:6
+        - f1
+      - - watertank
+    - - []
+      - - watertank
+      - - ld_0x51:8
+        - f0
+      - - ld_0x51:9
+        - f0
+    - - []
+      - - watertank
+      - - valve_0x51:6
+        - f0
+    - - []
+      - - valve_0x51:6
+        - f1
+      - - thermometer_0x22:2
+        - f0
+    - - []
+      - - thermometer_0x22:2
+        - f1
+      - - scales_0x82
+        - f0
+    - - []
+      - - watertank
+      - - valve_0x51:7
+        - f0
+    - - []
+      - - valve_0x51:7
+        - f1
+      - - thermometer_0x22:0
+        - f0
+    - - []
+      - - thermometer_0x22:0
+        - f1
+      - - scales_0x81
+        - f0
+    - - []
+      - - watertank
+      - - valve_0x51:8
+        - f0
+    - - []
+      - - valve_0x51:8
+        - f1
+      - - thermometer_0x22:1
+        - f0
+    - - []
+      - - thermometer_0x22:1
+        - f1
+      - - scales_0x80
+        - f0
+    - - []
+      - - scales_0x82
+        - f1
+      - - fcd_0x90:2
+        - f0
+    - - []
+      - - scales_0x81
+        - f1
+      - - fcd_0x90:1
+        - f0
+    - - []
+      - - scales_0x80
+        - f1
+      - - fcd_0x90:0
+        - f0
+    - - []
+      - - fcd_0x90:0
+        - f1
+      - - valve_0x50:0
+        - f0
+      - - valve_0x50:1
+        - f0
+      - - valve_0x50:6
+        - f0
+      - - valve_0x50:2
+        - f0
+    - - []
+      - - fcd_0x90:2
+        - f1
+      - - valve_0xC1:5
+        - f0
+    - - []
+      - - watertank
+      - - valve_0xC1:4
+        - f1
+    - - []
+      - - valve_0xC1:5
+        - f1
+      - - valve_0xC1:4
+        - f0
+      - - valve_0x51:0
+        - f0
+  delphi_mapping_comments:
+  - Промежуточная совместимость с програмой на дельфи.
+  - Ключ - имя компонента на дельфи, значение - имя устройства здесь.
+  - Counter и ThermoGigrometer создаются в коде (TFlowPlantEngine.Create), а не на форме.
+  - Контакт медленных импульсов и ТПУ на форме отсутствуют (создаются в коде), поэтому в маппинге их нет.
+  - 'Hygrometer1 и Barometer1 (Virtual) в маппинг не включены: виртуальных устройств в схеме нет.'
+  delphi_mapping:
+    Flowmeter1: flowmeter_0x1:0
+    Flowmeter2: flowmeter_0x1:1
+    Flowmeter3: flowmeter_0x1:2
+    Flowmeter4: flowmeter_0x1:3
+    Thermometer1: thermometer_0x21:0
+    Thermometer2: thermometer_0x21:1
+    Thermometer3: thermometer_0x21:2
+    Thermometer4: thermometer_0x21:3
+    Thermometer5: thermometer_0x20:0
+    Thermometer6: thermometer_0x20:1
+    Thermometer7: thermometer_0x20:2
+    Thermometer8: thermometer_0x20:3
+    Thermometer9: thermometer_0x22:1
+    Thermometer10: thermometer_0x22:0
+    Thermometer11: thermometer_0x22:2
+    Thermometer12: thermometer_0x23:0
+    Manometer1: manometer_0x5:4
+    Manometer2: manometer_0x5:6
+    Manometer3: manometer_0x5:5
+    ElectricValve1: valve_0x50:0
+    ElectricValve2: valve_0x50:1
+    ElectricValve3: valve_0x50:2
+    ElectricValve4: valve_0x51:0
+    PneumaticValve1: valve_0xC1:0
+    PneumaticValve2: valve_0xC1:3
+    PneumaticValve3: valve_0xC1:1
+    PneumaticValve4: valve_0xC1:2
+    PneumaticValve5: valve_0xC1:5
+    PneumaticValve6: valve_0xC1:4
+    PneumaticValve7: valve_0xC1:6
+    PneumaticValve8: valve_0x50:6
+    PneumaticValve9: valve_0x50:7
+    PneumaticValve10: valve_0xC1:8
+    PneumaticValve11: valve_0xC1:9
+    BlcedValve1: valve_0x51:8
+    BlcedValve2: valve_0x51:7
+    BlcedValve3: valve_0x51:6
+    LevelDetector1: ld_0x51:8
+    LevelDetector2: ld_0x51:9
+    LevelDetector3: ld_0x50:8
+    LevelDetector4: ld_0x50:9
+    Scales1: scales_0x80
+    Scales2: scales_0x81
+    Scales3: scales_0x82
+    FCD1: fcd_0x90:0
+    FCD2: fcd_0x90:1
+    FCD3: fcd_0x90:2
+    Pump1: pump_0x2
+    Pump2: pump_0x9
+    Counter: counter_0x1
+    ThermoGigrometer: thermogigrometer_0x40
+  setup_comments:
+  - В setup, если параметр не указан, выполняется попытка автоопределения (если поддерживается).
+  - 'Количества приборов/механизмов и привязки (расходомер↔термометр, весы↔термометр, стол↔задвижки) не задаются: вычисляются
+    из plant.devices и plant.graph.'
+  - devices_calibrating — FP_DEVICES_CALIBRATING (ПРЭМы).
+  - 'Рабочие столы: столы 2 и 3 отличаются только приборами, задвижки у них общие.'
+  - 'Файловые пути, имена логов и отчётов в конфиге не хранятся: это не описывает установку.'
+  setup:
+    heating: false
+    flowmeter_mass: true
+    measurement_methodology_36_65: true
+    fast_discharge: false
+    counter_new: false
+    manometer_second: true
+    generator: true
+    pumps_always_together: false
+    pumps_consecutively: false
+    pumps_unoperated_offset: 9
+    fastwel_comments:
+    - Т.к. это по сути драйвер, т.е. interface в определении этого конфига, это пое нужно будет в итоге удалить, а fastwel
+      станет просто типом интерфейса.
+    fastwel: false
+    prover_comments:
+    - Либо структура, либо false. Или "auto".
+    - 'Поля: `thermometer`, `manometer`, `valve`.'
+    - В сборке №066 ТПУ выключен (FP_PROVER_SUPPORT=false), модуль ТПУ ($25) не создаётся.
+    - 'Бывшая ссылка valve_0x80:3 недействительна: у модуля Valve есть только задвижки 0..2, такого устройства нет в devices.'
+    - 'Если ТПУ включат: thermometer — ДТ 1 (thermometer_0x21:0, FP_PROVER_THERMOMETER_NUMBER=1), manometer — ДД 2 (manometer_0x5:6,
+      «давление №2 используется для ТПУ»), valve — указать реальную задвижку.'
+    prover: false
+    batcher: false
+    rotameter_comments:
+    - Либо структура, либо false. Или "auto"
+    - 'Поля: `channel.current`, `channel.pressure`.'
+    rotameter: false
+    thermometer:
+      ambient_comments:
+      - Термометр температуры окружающего воздуха.
+      ambient: thermometer_0x21:0
+      flowmeter_comments:
+      - Может либо быть структурой с картой, указывающей, какие расходомеры к каким термометрам. Ключ - имя расходомера, значение
+        - имя термоментра.
+      - Для карты `default` это ключевое слово, задающее какой термометр брать, если расходомер не указан в карте. Если такого
+        поля нет, отсуствие в карте расходомера считается ошибкой.
+      - Либо можно вместо структуры указать имя одного термометра как значение поля для всех расходомеров.
+      flowmeter:
+        flowmeter_0x1:0: thermometer_0x20:0
+        flowmeter_0x1:1: thermometer_0x20:1
+        flowmeter_0x1:2: thermometer_0x20:2
+        flowmeter_0x1:3: thermometer_0x20:3
+      scales_comments:
+      - Аналогично `flowmeter`, но для весов.
+      scales:
+        scales_0x80: thermometer_0x22:1
+        scales_0x81: thermometer_0x22:0
+        scales_0x82: thermometer_0x22:2
+      coriolis:
+        input: thermometer_0x21:2
+        output: thermometer_0x21:3
+    manometer:
+      input: manometer_0x5:4
+      output: manometer_0x5:6
+      sample: manometer_0x5:5
+    level_detector:
+      protection: ld_0x51:8
+      spill_start:
+      - ld_0x51:8
+      - ld_0x51:9
+      desk:
+      - ld_0x50:8
+      - ld_0x50:9
+      - ld_0x50:9
+    pipeline:
+      volume:
+        scales_0x80: 0.1
+        scales_0x81: 0.3
+        scales_0x82: 1.5
+      flowmeter_by_valve:
+        '1': flowmeter_0x1:1
+        '2': flowmeter_0x1:1
+        '3': flowmeter_0x1:2
+        '4': flowmeter_0x1:3
+      pump_frequency_by_valve:
+        '1': 15
+        '2': 15
+        '3': 10
+        '4': 10
+      filling_valve_numbers:
+      - 1
+      - 2
+      valve:
+        filling: valve_0x50:6
+        bypass: valve_0x50:7
+    routing_comments:
+    - Explicit replacements for SetPneumaticValves' former hard-coded (flowmeter,FCD)->valve and pump-count->valve cases.
+      Values were copied from the current implementation.
+    - flowmeter_number and fcd_number are 1-based component numbers; fcd_number 0 means no FCD.
+    routing:
+      flowmeter_fcd:
+      - flowmeter_number: 4
+        fcd_number: 0
+        valves:
+        - valve_0xC1:4
+      - flowmeter_number: 4
+        fcd_number: 3
+        valves:
+        - valve_0xC1:5
+      pump_count:
+      - pump_count: 2
+        valves:
+        - valve_0xC1:6
+      collider:
+        desk_1_valves:
+        - valve_0xC1:3
+        - valve_0xC1:1
+        - valve_0x50:7
+        other_desk_valves:
+        - valve_0xC1:2
+        - valve_0xC1:5
+        - valve_0x50:7
+        partial_electric_valve: valve_0x50:2
+        partial_position: 50
+        minimum_pressure: 2
+        minimum_manual_pressure: 2.5
+        initial_regulator_pressure_per_power: 0.32
+        regulator_pressure_per_power: 0.2
+    desk_comments:
+    - Здесь указываются рабочие столы. Не нужно объяснять, что нужно включить вохможность переключать столы, если их больше
+      одного?
+    - 'Каждому рабочему стола соотвествует определённая конфигурация задвижек: указываются только те задвижки, которые должны
+      быть открыты.'
+    - В дельфи столов три (FP_DESKS_COUNT=3); столы 2 и 3 открывают одну и ту же пару задвижек (ПЗ 3 и ПЗ 4), отличаются только
+      термометрами/манометрами.
+    - fast_discharge — прямого соответствия в дельфи нет (есть режим медленных импульсов и галки на форме проливки); уточнить.
+    desk:
+    - valves:
+      - valve_0xC1:0
+      - valve_0xC1:3
+      thermometer:
+        input: thermometer_0x21:0
+        output: thermometer_0x21:3
+    - valves:
+      - valve_0xC1:1
+      - valve_0xC1:2
+      thermometer:
+        input: thermometer_0x21:1
+        output: thermometer_0x21:2
+    - valves:
+      - valve_0xC1:1
+      - valve_0xC1:2
+      thermometer:
+        input: thermometer_0x21:2
+        output: thermometer_0x21:3
+    devices_calibrating: false
+    timeouts_comments:
+    - 'Время — в секундах: базовая единица СИ, поэтому целые значения пишутся числом (25, 900, 1), без постфикса.'
+    - Если значение не выражается целыми секундами — строка с единицами, например "250ms".
+    - 'Блок — бывшие константы PlantConstants: FP_PNEUMATIC_VALVES_SWITCH_TIME, FP_PRESSURE_STABILIZATION_TIME, FP_WATER_DISCHARGE_STABILIZATION_TIME,
+      FP_SET_WATER_DISCHARGE_TIME (5 мин), FP_MAX_SPILL_DELAY, FP_PST_*.'
+    - Тот же формат у device.time_to_switch.
+    timeouts:
+      pneumatic_valves_switch_time: 25
+      pressure_stabilization_time: 900
+      water_discharge_stabilization_time: 15
+      set_water_discharge_time: 300
+      max_spill_delay: 150
+      pst_pouring_out: 140
+      pst_setting_water_discharge: 70
+      pst_stabilization: 80
+    limits_comments:
+    - 'Бывшие константы PlantConstants: FP_MAX_PRESSURE_ERROR, FP_PIPELINE_FILLING_MAX_WATER_DISCHARGE, FP_POUR_OUT_SAMPLE_COUNT,
+      FP_SCALES_CALIBRATION_WEIGHTS_BUFFER_LENGTH.'
+    limits:
+      max_pressure_error: 3
+      pipeline_filling_max_water_discharge: 10
+      pour_out_sample_count: 5
+      scales_calibration_weights_buffer_length: 300
+    polling_comments:
+    - 'Бывшие константы PlantConstants: FP_GETTING_FREQUENCIES_INTERVAL, FP_GETTING_WATER_DISCHARGE_INTERVAL.'
+    polling:
+      frequency_interval: 1
+      water_discharge_interval: 1
